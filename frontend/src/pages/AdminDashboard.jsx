@@ -8,23 +8,25 @@ const AdminDashboard = () => {
   const [message, setMessage] = useState('');
 
   const fetchShipments = async () => {
-    const res = await axisoInstance.get('/shipment/allShipment', { withCredentials: true });
-    setShipments(res.data.shipments);
+    const res = await axisoInstance.get('http://localhost:8000/api/v1/shipment/allShipment', { withCredentials: true });
+    setShipments(res.data.data);
   };
 
   const fetchDeliveryPersonnel = async () => {
-    const res = await axisoInstance.get('/shipment/delivery', { withCredentials: true });
-    setDeliveryUsers(res.data.users);
+    const res = await axios.get('http://localhost:8000/api/v1/shipment/delivery', { withCredentials: true });
+    setDeliveryUsers(res.data.data);
   };
 
 
-  const assignDelivery = async (shipmentId, deliveryId) => {
+  const assignDelivery = async (shipmentId, deliveryPersonId) => {
     try {
-      await axisoInstance.put(
-        `/shipment/${shipmentId}/assignShipment`,
-        { deliveryId },
+      console.log(deliveryPersonId)
+    const res=  await axios.put(
+        `http://localhost:8000/api/v1/shipment/${shipmentId}/assignShipment`,
+        { deliveryPersonId },
         { withCredentials: true }       
       );
+      console.log(res)
       setMessage('Delivery person assigned!');
       fetchShipments();
     } catch {
@@ -42,14 +44,14 @@ const AdminDashboard = () => {
       <h2 className="text-2xl font-bold mb-4 text-center">Admin Dashboard</h2>
       {message && <p className="mb-4 text-green-600 text-center">{message}</p>}
 
-      {shipments.length === 0 ? (
+      {shipments?.length === 0 ? (
         <p>No shipments found.</p>
       ) : (
         <ul className="space-y-4">
-          {shipments.map((s) => (
+          {shipments?.map((s) => (
             <li key={s._id} className="border p-4 rounded shadow-sm bg-white">
-              <p><strong>Recipient:</strong> {s.recipient}</p>
-              <p><strong>Address:</strong> {s.address}</p>
+              <p><strong>Recipient:</strong> {s.userId.name}</p>
+              <p><strong>Address:</strong> {s.delivery}</p>
               <p><strong>Status:</strong> {s.status}</p>
               <p>
                 <strong>Delivery:</strong> {s.assignedTo ? s.assignedTo.name : 'Not assigned'}

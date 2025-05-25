@@ -9,7 +9,7 @@ const Navbar = () => {
 
   const checkLogin = async () => {
     try {
-      await axiosInstance.get('/user/me', { withCredentials: true });
+      await axios.get('http://localhost:8000/api/v1/user/me', { withCredentials: true });
       setIsAuthenticated(true);
     } catch {
       setIsAuthenticated(false);
@@ -17,7 +17,7 @@ const Navbar = () => {
   };
 
   const handleLogout = async () => {
-    await axiosInstance.get('/users/logout', {}, { withCredentials: true });
+    await axios.get('http://localhost:8000/api/v1/user/logout', {}, { withCredentials: true });
     setIsAuthenticated(false);
     navigate('/login');
   };

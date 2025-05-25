@@ -29,18 +29,17 @@ export const register = Asynchandler(async(req , res , next) => {
 })
 
 export const login = Asynchandler(async(req,res,next)=>{
-    console.log(req.body)
     const {email,password} = req.body
     const user = await User.findOne({email})
     if(!user)throw new Apierror(400,"User not found")
-    
-    const isPasswordCorrect = await user.isPasswordCorrect(password)
-    if(!isPasswordCorrect)throw new Apierror(400,"Password is incorrect")
-    const token = createToken(user._id,user.role)
-    const options = {
-        httpOnly: true,
-        secure: true,
-      };
+        
+        const isPasswordCorrect = await user.isPasswordCorrect(password)
+        if(!isPasswordCorrect)throw new Apierror(400,"Password is incorrect")
+            const token = createToken(user._id,user.role)
+        const options = {
+            httpOnly: true,
+            secure: true,
+        };
     return res.status(200)
     .cookie("token", token, options)
     .json(new ApiResponse(200, user, "User logged in successfully"))    
@@ -53,7 +52,8 @@ export const  logout = Asynchandler(async(req,res,next)=>{
 })
 
 export const me =Asynchandler(async(req,res,next)=>{
-    const user = await User.findById(req.user.userId).select('name email role');
+    // console.log(req.user)
+    const user = await User.findById(req.user._id).select('name email role');
     return res.status(200)
     .json(new ApiResponse(200,user,"User details"))
 })

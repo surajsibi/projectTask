@@ -11,8 +11,9 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.get('/user/login', { email, password }, { withCredentials: true });
-      const role = res.data.user.role;
+      const res = await axios.post('http://localhost:8000/api/v1/user/login', { email, password }, { withCredentials: true });
+      const role = res.data?.data?.role;
+      console.log(role)
       if (role === 'admin') navigate('/admin');
       else if (role === 'delivery') navigate('/delivery');
       else navigate('/user');

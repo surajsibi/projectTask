@@ -1,16 +1,17 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import axisoInstance from '../helper/AxiosInstance';
+import { useState, useEffect } from "react";
+import axios from "axios";
+import axisoInstance from "../helper/AxiosInstance";
 
 const UserDashboard = () => {
   const [shipmentData, setShipmentData] = useState({
-    recipient: '',
-    address: '',
-    packageDetails: '',
+    recipient: "",
+    pickup: "",
+    delivery: "",
+    packageType: "",
   });
 
   const [shipments, setShipments] = useState([]);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
     setShipmentData({ ...shipmentData, [e.target.name]: e.target.value });
@@ -19,18 +20,33 @@ const UserDashboard = () => {
   const bookShipment = async (e) => {
     e.preventDefault();
     try {
-      const res = await axisoInstance.post('/shipments/book', shipmentData, { withCredentials: true });
-      setMessage('Shipment booked successfully!');
-      setShipments([res.data.shipment, ...shipments]);
-      setShipmentData({ recipient: '', address: '', packageDetails: '' });
+      const res = await axios.post(
+        "http://localhost:8000/api/v1/shipment/book",
+        shipmentData,
+        { withCredentials: true }
+      );
+
+      setMessage("Shipment booked successfully!");
+      setShipments([res.data.data, ...shipments]);
+      console.log(shipments);
+      setShipmentData({
+        recipient: "",
+        pickup: "",
+        delivery: "",
+        packageType: "",
+      });
     } catch (err) {
-      setMessage('Booking failed');
+      setMessage("Booking failed");
     }
   };
 
   const fetchShipments = async () => {
-    const res = await axisoInstance.get('/shipments/myShipment', { withCredentials: true });
-    setShipments(res.data.shipments);
+    const res = await axios.get(
+      "http://localhost:8000/api/v1/shipment/myShipment",
+      { withCredentials: true }
+    );
+    console.log(res);
+    setShipments(res.data.data);
   };
 
   useEffect(() => {
@@ -44,7 +60,10 @@ const UserDashboard = () => {
       {message && <p className="mb-4 text-center text-green-600">{message}</p>}
 
       {/* Booking Form */}
-      <form onSubmit={bookShipment} className="bg-white p-4 rounded-lg shadow mb-6 space-y-4">
+      <form
+        onSubmit={bookShipment}
+        className="bg-white p-4 rounded-lg shadow mb-6 space-y-4"
+      >
         <input
           type="text"
           name="recipient"
@@ -56,19 +75,28 @@ const UserDashboard = () => {
         />
         <input
           type="text"
-          name="address"
+          name="pickup"
+          placeholder="Pickup Address"
+          className="w-full p-2 border rounded"
+          value={shipmentData.pickup}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="text"
+          name="delivery"
           placeholder="Delivery Address"
           className="w-full p-2 border rounded"
-          value={shipmentData.address}
+          value={shipmentData.delivery}
           onChange={handleChange}
           required
         />
         <textarea
-          name="packageDetails"
+          name="packageType"
           placeholder="Package Details"
           className="w-full p-2 border rounded"
           rows="3"
-          value={shipmentData.packageDetails}
+          value={shipmentData.packageType}
           onChange={handleChange}
           required
         />
@@ -80,16 +108,28 @@ const UserDashboard = () => {
       {/* Shipments List */}
       <div>
         <h3 className="text-xl font-semibold mb-2">My Shipments</h3>
-        {shipments.length === 0 ? (
+        {shipments?.length === 0 ? (
           <p className="text-gray-600">No shipments yet.</p>
         ) : (
           <ul className="space-y-4">
-            {shipments.map((s) => (
+            {shipments?.map((s) => (
               <li key={s._id} className="border rounded p-3 shadow-sm bg-white">
-                <p><strong>Recipient:</strong> {s.recipient}</p>
-                <p><strong>Address:</strong> {s.address}</p>
-                <p><strong>Details:</strong> {s.packageDetails}</p>
-                <p><strong>Status:</strong> <span className="text-blue-600 font-medium">{s.status}</span></p>
+                <p>
+                  <strong>Sender:</strong> {s?.userId?.name}
+                </p>
+                <p>
+                  <strong>Pickup:</strong> {s.pickup}
+                </p>
+                <p>
+                  <strong>Delivery:</strong> {s.delivery}
+                </p>
+                <p>
+                  <strong>Details:</strong> {s.packageType}
+                </p>
+                <p>
+                  <strong>Status:</strong>{" "}
+                  <span className="text-blue-600 font-medium">{s.status}</span>
+                </p>
               </li>
             ))}
           </ul>

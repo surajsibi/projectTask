@@ -10,8 +10,9 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
-      const res = await axisoInstance.get('/user/me', { withCredentials: true });
-      setUser(res.data.user);
+      const res = await axisoInstance.get('http://localhost:8000/api/v1/user/me', { withCredentials: true });
+      // console.log(res)
+      setUser(res.data.data);
     } catch {
       setUser(null);
     } finally {

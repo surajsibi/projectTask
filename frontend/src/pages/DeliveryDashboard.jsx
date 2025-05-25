@@ -8,8 +8,10 @@ const DeliveryDashboard = () => {
 
   const fetchShipments = async () => {
     try {
-      const res = await axisoInstance.get('/shipment/myDeliveries', { withCredentials: true });
-      setAssignedShipments(res.data.shipments);
+      const res = await axios.get('http://localhost:8000/api/v1/shipment/myDeliveries', { withCredentials: true });
+      
+      console.log(res)
+      setAssignedShipments(res.data.data);
     } catch (err) {
       setMessage('Failed to load shipments');
     }
@@ -17,7 +19,8 @@ const DeliveryDashboard = () => {
 
   const markAsDelivered = async (id) => {
     try {
-      await axisoInstance.put(`/shipment/${id}/markDelivered`, {}, { withCredentials: true });
+      console.log(id)
+      await axios.put(`http://localhost:8000/api/v1/shipment/${id}/markDelivered`, {}, { withCredentials: true });
       setMessage('Shipment marked as delivered!');
       fetchShipments(); // Refresh list
     } catch {
@@ -34,15 +37,15 @@ const DeliveryDashboard = () => {
       <h2 className="text-2xl font-bold mb-4 text-center">Delivery Dashboard</h2>
       {message && <p className="text-green-600 mb-4 text-center">{message}</p>}
 
-      {assignedShipments.length === 0 ? (
+      {assignedShipments?.length === 0 ? (
         <p className="text-center">No assigned shipments yet.</p>
       ) : (
         <ul className="space-y-4">
-          {assignedShipments.map((s) => (
+          {assignedShipments?.map((s) => (
             <li key={s._id} className="border p-4 rounded shadow-sm bg-white">
-              <p><strong>Recipient:</strong> {s.recipient}</p>
-              <p><strong>Address:</strong> {s.address}</p>
-              <p><strong>Details:</strong> {s.packageDetails}</p>
+              <p><strong>Recipient:</strong> {s.userId?.name}</p>
+              <p><strong>Address:</strong> {s.delivery}</p>
+              <p><strong>Details:</strong> {s.packageType}</p>
               <p><strong>Status:</strong> <span className="text-blue-600">{s.status}</span></p>
 
               {s.status !== 'Delivered' && (
