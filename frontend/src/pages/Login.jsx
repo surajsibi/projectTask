@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../helper/AxiosInstance';
-
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -13,16 +11,12 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axiosInstance.post('/user/login', { email, password }, { withCredentials: true });
-      console.log(res)
+      const res = await axios.get('/user/login', { email, password }, { withCredentials: true });
       const role = res.data.user.role;
       if (role === 'admin') navigate('/admin');
       else if (role === 'delivery') navigate('/delivery');
       else navigate('/user');
     } catch (err) {
-      console.log(err)
-      console.log(email,password);
-      
       setError('Invalid credentials');
     }
   };
