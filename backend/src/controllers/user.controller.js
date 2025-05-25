@@ -29,6 +29,7 @@ export const register = Asynchandler(async(req , res , next) => {
 })
 
 export const login = Asynchandler(async(req,res,next)=>{
+    console.log(req.body)
     const {email,password} = req.body
     const user = await User.findOne({email})
     if(!user)throw new Apierror(400,"User not found")
